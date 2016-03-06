@@ -1,0 +1,19 @@
+{
+  "name": "tilelive-fractal",
+  "version": "0.1.0",
+  "description": "A tilelive provider that generates fractal tiles.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "tessera --require ../../ fractal:julia"
+  },
+  "author": "Marc Farra <marcfarra@gmail.com>",
+  "license": "ISC",
+  "dependencies": {
+    "mapnik": "^3.5.2",
+    "mathjs": "^3.0.0"
+  },
+  "devDependencies": {
+    "tessera": "^0.8.0"
+  }
+}
