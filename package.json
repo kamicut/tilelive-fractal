@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "tessera --require ../../ fractal:julia",
+    "start": "tessera --require ../../",
     "build": "npm run build-rust && npm run build-ffi",
     "build-ffi": "(cd ffi && node-gyp configure build)",
     "build-rust": "(cd native && cargo build --release)"

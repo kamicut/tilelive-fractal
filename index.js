@@ -4,7 +4,7 @@ var ffi = require('./ffi');
 var mapnik = require("mapnik"),
     tiletype = require("tiletype");
 
-function pixelsToIm(res, pixels) {
+function pixelsToIm(res, pixels, callback) {
   var im = new mapnik.Image(res, res);
   pixels.forEach(function (pixel, index) {
     var x = Math.floor(index / res);
@@ -16,27 +16,36 @@ function pixelsToIm(res, pixels) {
 
     im.setPixel(x, y, new mapnik.Color(red, blue, green));
   })
-  return im.encodeSync('png');
+  im.encode('png', callback);
 }
+
 module.exports = function(tilelive, options) {
   var Fractal = function(uri, callback) {
     if (typeof(uri) === "string") {
       uri = url.parse(uri, true);
     }
 
-    this.fractal = decodeURIComponent(uri.hostname + (uri.pathname || "").slice(1));
+    console.log(uri);
+    this.fractal = decodeURIComponent(uri.hostname);
+    this.fractalParams = (uri.pathname || "0,0").slice(1).split(',')
     this.format = uri.query.format || "png";
-    this.tileSize = (uri.query.tileSize | 0) || 256;
+    this.tileSize = 256;
     this.headers = {'Content-Type': 'image/png'};
     return callback(null, this);
   };
 
   Fractal.prototype.getTile = function(z, x, y, callback) {
+    var module = this;
     var zoom = 8.0/Math.pow(2, (z + 1));
     var offsetx = x * zoom - 2.0;
     var offsety = y * zoom - 2.0;
-    var pixels = ffi.julia(this.tileSize, this.tileSize, offsetx, offsety, zoom, -0.4, 0.6);
-    return callback(null, pixelsToIm(this.tileSize, pixels), this.headers);
+    var cRe = parseFloat(this.fractalParams[0]);
+    var cIm = parseFloat(this.fractalParams[1]);
+    ffi.julia(this.tileSize, this.tileSize, offsetx, offsety, zoom, cRe, cIm, function (pixels) {
+      pixelsToIm(module.tileSize, pixels, function (err, pngData) {
+        return callback(null, pngData, module.headers);
+      })
+    });
   };
 
   Fractal.prototype.getInfo = function(callback) {
