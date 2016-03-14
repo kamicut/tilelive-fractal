@@ -14,7 +14,8 @@
   "license": "ISC",
   "dependencies": {
     "mapnik": "^3.5.2",
-    "mathjs": "^3.0.0"
+    "mathjs": "^3.0.0",
+    "node-gyp": "^3.3.1"
   },
   "devDependencies": {
     "tessera": "^0.8.0"

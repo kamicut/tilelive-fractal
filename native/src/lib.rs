@@ -24,25 +24,31 @@ impl Array {
     }
 }
 
-fn hue_to_rgb(i: f64) -> f64 {
+fn hue_to_rgb(p: f64, q: f64, i: f64) -> f64 {
     let mut h = i;
+    if h < 0.0 {
+        h = h + 1.0;
+    }
     if h > 1.0 {
         h = h - 1.0;
     }
     let ret = match h {
-        h if h < 0.0 => 0.0,
-        h if h < 0.16 => 6.0 * h,
-        h if h < 0.5 => 1.0,
-        h if h < 0.67 => (0.67 - h) * 6.0,
-        _ => 1.0
+        h if h < 0.16 => p + (q - p) * 6.0 * h,
+        h if h < 0.5 => q,
+        h if h < 0.67 => p + (q - p) * (0.67 - h) * 6.0,
+        _ => p
     };
     ret * 255.0
 }
 
 fn pack_rgb(lum: f64) -> i32 {
-    let red = hue_to_rgb(lum/255.0 - 0.3) as i32;
-    let blue = hue_to_rgb(lum/255.0) as i32;
-    let green = hue_to_rgb(lum/255.0 + 0.3) as i32;
+    let l = 0.4;
+    let s = 0.8;
+    let q = if l < 0.5 {l * (1.0 + s) } else {l + s - l * s};
+    let p = 2.0 * l - q;
+    let red = hue_to_rgb(p, q, lum - 0.3)  as i32;
+    let blue = hue_to_rgb(p, q, lum) as i32;
+    let green = hue_to_rgb(p, q, lum + 0.3) as i32;
 
     65536 * red + 256 * green + blue
 }
@@ -67,6 +73,7 @@ pub extern fn julia(imgx: i32, imgy: i32, offsetx: f64, offsety: f64,
          let cx = (x as f64 * scalex) + offsetx;
 
          let mut z = Complex::new(cx, cy);
+         let mut smoothcolor = (-z.norm()).exp();
          let mut i = 0;
 
          for t in 0..max_iterations {
@@ -75,8 +82,10 @@ pub extern fn julia(imgx: i32, imgy: i32, offsetx: f64, offsety: f64,
              }
              z = z * z + c;
              i = t;
+             smoothcolor += (-z.norm()).exp()
          }
-         let lum = i as f64;
+         let lum = i as f64/255.0;
+         //let lum = 0.95 + 10.0 * (smoothcolor/255.0) as f64;
          pack_rgb(lum)
        }).collect_into(&mut v);
 
