@@ -6,6 +6,7 @@ authors = ["Marc Farra <marcfarra@gmail.com>"]
 [dependencies]
 num = "*"
 libc = "*"
+rayon = "*"
 
 [lib]
 name = "embed"

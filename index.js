@@ -33,8 +33,8 @@ module.exports = function(tilelive, options) {
 
   Fractal.prototype.getTile = function(z, x, y, callback) {
     var zoom = 8.0/Math.pow(2, (z + 1));
-    var offsetx = y * zoom - 2.0;
-    var offsety = x * zoom - 2.0;
+    var offsetx = x * zoom - 2.0;
+    var offsety = y * zoom - 2.0;
     var pixels = ffi.julia(this.tileSize, this.tileSize, offsetx, offsety, zoom, -0.4, 0.6);
     return callback(null, pixelsToIm(this.tileSize, pixels), this.headers);
   };

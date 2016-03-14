@@ -1,9 +1,11 @@
 extern crate libc;
 extern crate num;
+extern crate rayon;
 
 use std::slice;
 use std::mem;
 use num::complex::Complex;
+use rayon::prelude::*;
 
 #[repr(C)]
 pub struct Array {
@@ -53,28 +55,30 @@ pub extern fn julia(imgx: i32, imgy: i32, offsetx: f64, offsety: f64,
     let scalex = zoom / imgx as f64;
     let scaley = zoom / imgy as f64;
 
-   let mut v = vec![0; (imgx * imgy) as usize];
    let c = Complex::new(cRe, cIm);
 
-    for x in 0..imgx {
-        for y in 0..imgy {
-            let cy = (y as f64 * scaley) + offsety;
-            let cx = (x as f64 * scalex) + offsetx;
+   let num_pixels = imgx * imgy;
+   let mut v = Vec::new();
+   let r = (0..num_pixels).into_par_iter().map(|i| {
+         let x: i32 = i / imgx;
+         let y: i32 = i % imgx;
 
-            let mut z = Complex::new(cx, cy);
-            let mut i = 0;
+         let cy = (y as f64 * scaley) + offsety;
+         let cx = (x as f64 * scalex) + offsetx;
 
-            for t in 0..max_iterations {
-                if z.norm() > 2.0 {
-                    break
-                }
-                z = z * z + c;
-                i = t;
-            }
-            let lum = i as f64;
-            v[(x * imgx + y) as usize] = pack_rgb(lum);
-        }
-    }
+         let mut z = Complex::new(cx, cy);
+         let mut i = 0;
 
-    Array::from_vec(v)
+         for t in 0..max_iterations {
+             if z.norm() > 2.0 {
+                 break
+             }
+             z = z * z + c;
+             i = t;
+         }
+         let lum = i as f64;
+         pack_rgb(lum)
+       }).collect_into(&mut v);
+
+    Array::from_vec(v.clone())
 }
