@@ -42,8 +42,8 @@ fn hue_to_rgb(p: f64, q: f64, i: f64) -> f64 {
 }
 
 fn pack_rgb(lum: f64) -> i32 {
-    let l = 0.4;
-    let s = 0.8;
+    let l = 0.6;
+    let s = 0.9;
     let q = if l < 0.5 {l * (1.0 + s) } else {l + s - l * s};
     let p = 2.0 * l - q;
     let red = hue_to_rgb(p, q, lum - 0.3)  as i32;
@@ -77,15 +77,14 @@ pub extern fn julia(imgx: i32, imgy: i32, offsetx: f64, offsety: f64,
          let mut i = 0;
 
          for t in 0..max_iterations {
-             if z.norm() > 2.0 {
+             if z.norm() > 30.0 {
                  break
              }
              z = z * z + c;
              i = t;
              smoothcolor += (-z.norm()).exp()
          }
-         let lum = i as f64/255.0;
-         //let lum = 0.95 + 10.0 * (smoothcolor/255.0) as f64;
+         let lum = 0.95 + 2.0 * (smoothcolor/255.0) as f64;
          pack_rgb(lum)
        }).collect_into(&mut v);
 
