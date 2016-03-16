@@ -1,5 +1,7 @@
 # tilelive-fractal
 
+A tilelive provider that generates fractals. Inspired by [tilelive-solid](https://github.com/mojodna/tilelive-solid)
+
 ## Build Requirements
 - [Rust](https://www.rust-lang.org/)
 - [Node.js and npm](https://nodejs.org/)
