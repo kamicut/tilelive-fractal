@@ -17,3 +17,5 @@ the complex number `c` using `fractal:julia/c_re,c_im` where `c_re` and `c_im` a
 ```
 npm start fractal:julia/-0.8,0.156
 ```
+
+<img width="1260" alt="localhost_8080__6_16_699_2_988" src="https://cloud.githubusercontent.com/assets/719357/13823125/b291f79a-eb7e-11e5-8718-158507169f7b.png">
